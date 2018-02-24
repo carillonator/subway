@@ -11,7 +11,13 @@ func printText(ss *StationSet, w io.Writer) {
 
 	now := time.Now().Unix()
 
-	fmt.Fprintf(w, "It is %d\n\n", now)
+	//fmt.Fprintf(w, "It is %d\n\n", now)
+	_ = `
+<html><head><style>
+body { font-size: 1.5em; }
+</style></head><body>
+`
+	//	fmt.Fprintln(w, header)
 
 	// TODO sort or weight
 	for _, s := range ss.Stations {
@@ -40,6 +46,7 @@ func printText(ss *StationSet, w io.Writer) {
 		}
 		fmt.Fprintln(w)
 	}
+	//	fmt.Fprintln(w, "</body></html>")
 }
 
 func unixToRelative(now int64, ts []int64) []int {

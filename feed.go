@@ -1,11 +1,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 
 	"github.com/carillonator/subway/stationinfo"
 	"github.com/golang/protobuf/proto"
@@ -109,12 +107,7 @@ func getEntities(feed *gtfs.FeedMessage) ([]*gtfs.TripUpdate, []*gtfs.VehiclePos
 }
 
 func fetch(id uint8) (*gtfs.FeedMessage, error) {
-	key := os.Getenv("MTA_API_KEY")
-	if key == "" {
-		return nil, errors.New("MTA_API_KEY not set")
-	}
-
-	url := fmt.Sprintf("%s?key=%s&feed_id=%d", urlBase, key, id)
+	url := fmt.Sprintf("%s?key=%s&feed_id=%d", urlBase, mtaKey, id)
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err

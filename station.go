@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/carillonator/subway/stationinfo"
@@ -31,6 +32,9 @@ func NewStationSet(complexes []int, cis stationinfo.ComplexInfoSet) (*StationSet
 
 	for _, s := range complexes {
 		ss.Stations[s] = &Station{Id: s}
+		if _, ok := cis[s]; !ok {
+			return nil, fmt.Errorf("%d is not an existing complex id", s)
+		}
 		ss.Stations[s].Name = cis[s].Name
 		ss.Stations[s].NorthTimes = make(map[string][]int64)
 		ss.Stations[s].SouthTimes = make(map[string][]int64)

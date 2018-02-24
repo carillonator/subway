@@ -1,13 +1,21 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"net/http"
+	"os"
+	"strconv"
+	"strings"
 
 	"github.com/carillonator/subway/stationinfo"
 )
 
 var cis = stationinfo.ComplexInfoSet{}
+var mtaKey = ""
+
+const usage = `
+  Usage: subway [ server | complexId,... ]
+`
 
 func init() {
 	var err error
@@ -15,20 +23,42 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	mtaKey = os.Getenv("MTA_API_KEY")
+	if mtaKey == "" {
+		log.Fatal("MTA_API_KEY not set")
+	}
 }
 
 func main() {
 
-	http.HandleFunc("/", requestHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	var arg string
+	if len(os.Args) > 1 {
+		arg = os.Args[1]
+	} else {
+		fmt.Println(usage)
+		os.Exit(2)
+	}
 
-	/*
-		stops := []int{237, 167, 611, 636}
-		ss, err := NewStationSet(stops, cis)
-		if err != nil {
-			log.Fatal(err)
+	var cids []int
+	if arg == "server" {
+		startServer()
+
+	} else {
+		for _, s := range strings.Split(arg, ",") {
+			id, err := strconv.Atoi(s)
+			if err != nil {
+				fmt.Println(usage)
+				os.Exit(2)
+			}
+			cids = append(cids, id)
 		}
+	}
 
-		printText(ss, os.Stdout)
-	*/
+	ss, err := NewStationSet(cids, cis)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	printText(ss, os.Stdout)
 }
