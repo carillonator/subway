@@ -12,7 +12,7 @@ func printText(ss *StationSet, w io.Writer) {
 	now := time.Now()
 	nowUnix := now.Unix()
 
-	fmt.Fprintf(w, "As of %s\n\n", now.Format("15:04:05"))
+	fmt.Fprintf(w, "As of %s\n\n", now.Format("3:04:05 MST"))
 
 	//fmt.Fprintf(w, "It is %d\n\n", now)
 	_ = `
