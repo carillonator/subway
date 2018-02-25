@@ -9,7 +9,10 @@ import (
 
 func printText(ss *StationSet, w io.Writer) {
 
-	now := time.Now().Unix()
+	now := time.Now()
+	nowUnix := now.Unix()
+
+	fmt.Fprintf(w, "As of %s\n\n", now.Format("15:04:05"))
 
 	//fmt.Fprintf(w, "It is %d\n\n", now)
 	_ = `
@@ -26,7 +29,7 @@ body { font-size: 1.5em; }
 		for line, times := range s.NorthTimes {
 			fmt.Fprintf(w, "  N  %s ", line)
 			// TODO sort
-			for i, t := range unixToRelative(now, times) {
+			for i, t := range unixToRelative(nowUnix, times) {
 				fmt.Fprintf(w, " %d", t)
 				if i > 8 {
 					break
@@ -36,7 +39,7 @@ body { font-size: 1.5em; }
 		}
 		for line, times := range s.SouthTimes {
 			fmt.Fprintf(w, "  S  %s ", line)
-			for i, t := range unixToRelative(now, times) {
+			for i, t := range unixToRelative(nowUnix, times) {
 				fmt.Fprintf(w, " %d", t)
 				if i > 8 {
 					break
