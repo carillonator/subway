@@ -9,10 +9,11 @@ import (
 
 func printText(ss *StationSet, w io.Writer) {
 
+	loc, _ := time.LoadLocation("America/New_York")
 	now := time.Now()
 	nowUnix := now.Unix()
 
-	fmt.Fprintf(w, "As of %s\n\n", now.Format("3:04:05 MST"))
+	fmt.Fprintf(w, "As of %s\n\n", now.In(loc).Format("3:04:05"))
 
 	//fmt.Fprintf(w, "It is %d\n\n", now)
 	_ = `
