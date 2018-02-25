@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"encoding/gob"
+	"encoding/hex"
 	"fmt"
 	"strings"
 
-	"github.com/carillonator/subway/stationinfo"
 	"github.com/google/gtfs-realtime-bindings/golang/gtfs"
 )
 
@@ -24,7 +26,7 @@ type StationSet struct {
 	Feeds     FeedSet
 }
 
-func NewStationSet(complexes []int, cis stationinfo.ComplexInfoSet) (*StationSet, error) {
+func NewStationSet(complexes []int, cis ComplexInfoSet) (*StationSet, error) {
 	// TODO what happens if the set of stations changes? can this be prevented?
 	// TODO probably load the cis here so it doesn't have to be done in main and passed all around here
 	ss := StationSet{}
@@ -104,7 +106,7 @@ func parseStopId(id string) (int, string) {
 		panic("unknown stopId: " + id)
 	}
 
-	complexId := stationinfo.ComplexFromGtfsId(id)
+	complexId := ComplexFromGtfsId(id)
 
 	return complexId, dir
 }
@@ -120,4 +122,35 @@ func stopTimesForTrip(tu *gtfs.TripUpdate) (string, map[string]int64) {
 		}
 	}
 	return routeId, times
+}
+
+func newComplexInfoSet() (ComplexInfoSet, error) {
+	gobBytes, err := hex.DecodeString(cisGobHex)
+	if err != nil {
+		return nil, err
+	}
+	decoder := gob.NewDecoder(bytes.NewBuffer(gobBytes))
+
+	err = decoder.Decode(&cis)
+	if err != nil {
+		return nil, err
+	}
+
+	return cis, nil
+}
+
+// TODO put this in the gob precompiled
+func ComplexFromGtfsId(id string) int {
+
+	for cid, c := range cis {
+		for _, s := range c.Stations {
+			// support either form, with or without direction suffix
+			if s.GtfsId == strings.TrimRight(id, "NS") {
+				return cid
+			}
+		}
+	}
+
+	// TODO why?
+	return 0
 }

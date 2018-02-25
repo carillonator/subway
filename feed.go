@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/carillonator/subway/stationinfo"
 	"github.com/golang/protobuf/proto"
 	"github.com/google/gtfs-realtime-bindings/golang/gtfs"
 )
@@ -41,7 +40,7 @@ func NewFeed(id uint8) (*Feed, error) {
 // TODO make interface
 type FeedSet map[uint8]*Feed
 
-func NewFeedSetFromComplexes(complexes []int, cis stationinfo.ComplexInfoSet) (FeedSet, error) {
+func NewFeedSetFromComplexes(complexes []int, cis ComplexInfoSet) (FeedSet, error) {
 	ids := make(map[uint8]bool)
 	for _, c := range complexes {
 		for _, s := range cis[c].Stations {

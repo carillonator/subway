@@ -6,11 +6,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/carillonator/subway/stationinfo"
 )
 
-var cis = stationinfo.ComplexInfoSet{}
+var cis = ComplexInfoSet{}
 var mtaKey = ""
 
 const usage = `
@@ -19,7 +17,7 @@ const usage = `
 
 func init() {
 	var err error
-	cis, err = stationinfo.NewComplexInfoSet()
+	cis, err = newComplexInfoSet()
 	if err != nil {
 		log.Fatal(err)
 	}

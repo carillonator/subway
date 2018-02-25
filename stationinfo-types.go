@@ -1,0 +1,1 @@
+stationinfo/types.go
