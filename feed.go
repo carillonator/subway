@@ -5,8 +5,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	gtfs "github.com/carillonator/subway/gtfs-realtime"
+	_ "github.com/carillonator/subway/nyct-subway"
 	"github.com/golang/protobuf/proto"
-	"github.com/google/gtfs-realtime-bindings/golang/gtfs"
 )
 
 const urlBase = "http://datamine.mta.info/mta_esi.php"

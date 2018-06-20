@@ -16,14 +16,21 @@ type Station struct {
 	Id   int
 	Name string
 	// map of lines to arrival times
-	NorthTimes map[string][]int64
-	SouthTimes map[string][]int64
+	NorthTimes map[string][]*Arrival
+	SouthTimes map[string][]*Arrival
 }
 
 type StationSet struct {
 	Timestamp uint64
 	Stations  map[int]*Station
 	Feeds     FeedSet
+}
+
+type Arrival struct {
+	Time        int64
+	Station     int
+	RouteId     string
+	Destination string
 }
 
 func NewStationSet(complexes []int, cis ComplexInfoSet) (*StationSet, error) {
@@ -38,8 +45,8 @@ func NewStationSet(complexes []int, cis ComplexInfoSet) (*StationSet, error) {
 			return nil, fmt.Errorf("%d is not an existing complex id", s)
 		}
 		ss.Stations[s].Name = cis[s].Name
-		ss.Stations[s].NorthTimes = make(map[string][]int64)
-		ss.Stations[s].SouthTimes = make(map[string][]int64)
+		ss.Stations[s].NorthTimes = make(map[string][]*Arrival)
+		ss.Stations[s].SouthTimes = make(map[string][]*Arrival)
 	}
 
 	feeds, err := NewFeedSetFromComplexes(complexes, cis)
@@ -69,6 +76,7 @@ func (ss *StationSet) update() error {
 	return nil
 }
 
+// TODO should this have ss as the receiver?
 func stationsFromFeed(ss *StationSet, feed *Feed) error {
 	ts := feed.Timestamp
 	// TODO this re-updates the ss with every feed, which is inaccurate
@@ -76,15 +84,22 @@ func stationsFromFeed(ss *StationSet, feed *Feed) error {
 
 	for _, tu := range feed.TripUpdates {
 		routeId, times := stopTimesForTrip(tu)
+		fmt.Printf("%+v\n", tu.Trip.1001)
 
 		for stopId, time := range times { //gtfs ids
 			complexId, dir := parseStopId(stopId)
 			// only keep the stops in the StationSet
 			if _, ok := ss.Stations[complexId]; ok {
+				arrival := &Arrival{
+					Time:        time,
+					Station:     complexId,
+					RouteId:     routeId,
+					Destination: "",
+				}
 				if dir == "N" {
-					ss.Stations[complexId].NorthTimes[routeId] = append(ss.Stations[complexId].NorthTimes[routeId], time)
+					ss.Stations[complexId].NorthTimes[routeId] = append(ss.Stations[complexId].NorthTimes[routeId], arrival)
 				} else {
-					ss.Stations[complexId].SouthTimes[routeId] = append(ss.Stations[complexId].SouthTimes[routeId], time)
+					ss.Stations[complexId].SouthTimes[routeId] = append(ss.Stations[complexId].SouthTimes[routeId], arrival)
 				}
 			}
 			// TODO if this is an update, remove stale ones??

@@ -40,7 +40,7 @@ func main() {
 
 	var cids []int
 	if arg == "server" {
-		startServer()
+		//	startServer()
 
 	} else {
 		for _, s := range strings.Split(arg, ",") {
@@ -58,5 +58,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	printText(ss, os.Stdout)
+	fmt.Println(ss)
+	//printText(ss, os.Stdout)
 }
